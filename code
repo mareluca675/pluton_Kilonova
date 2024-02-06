@@ -1,0 +1,98 @@
+#include <fstream>
+#include <vector>
+#include <algorithm>
+#include <cstring>
+#include <string>
+#include <iostream>
+
+struct pluton
+{
+    unsigned int nr;
+    std::vector<unsigned int> v;
+};
+
+bool isPluton(unsigned int a, unsigned int b)
+{
+    int digitsA[10] = { 0 };
+    int digitsB[10] = { 0 };
+
+    while (a > 0)
+    {
+        digitsA[a % 10] ++;
+        a /= 10;
+    }
+
+    while (b > 0)
+    {
+        digitsB[b % 10]++;
+        b /= 10;
+    }
+
+    for (int i = 0; i < 10; ++i)
+    {
+        if (digitsA[i] != digitsB[i])
+            return false;
+    }
+
+    return true;
+}
+
+unsigned int n, plutoane, nrSoldati = 1, maxSoldati, iMaxSol = 1, nrMaxSoldati;
+bool visit[4001] = { false };
+
+int main()
+{
+    std::ios::sync_with_stdio(false);
+    std::ifstream cin("pluton.in");
+    std::ofstream cout("pluton.out");
+
+    cin >> n;
+    plutoane = n;
+
+    std::vector<pluton> vec(n);
+
+    for (auto& i : vec)
+    {
+        cin >> i.nr;
+    }
+
+    for (unsigned int i = 0; i < n; i++)
+    {
+        if (!visit[i])
+        {
+            nrSoldati = 1;
+            vec[i].v.emplace_back(i);
+
+            for (unsigned int j = i + 1; j < n; j++)
+            {
+                if (!visit[j] and isPluton(vec[i].nr, vec[j].nr) == true)
+                {
+                    plutoane--;
+                    vec[i].v.emplace_back(j);
+                    visit[j] = true;
+                    nrSoldati++;
+                }
+            }
+
+            if (nrSoldati > maxSoldati)
+            {
+                nrMaxSoldati = 1;
+                iMaxSol = i;
+                maxSoldati = nrSoldati;
+            }
+            else if (nrSoldati == maxSoldati)
+            {
+                nrMaxSoldati++;
+            }
+        }
+    }
+
+    cout << plutoane << '\n' << maxSoldati << '\n' << nrMaxSoldati << '\n';
+
+    for (auto& i : vec[iMaxSol].v)
+    {
+        cout << vec[i].nr << ' ';
+    }
+
+    return 0;
+}
